@@ -1,7 +1,12 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:tagyou/constant.dart';
+import 'package:http/http.dart' as http;
+import 'package:tagyou/homepage.dart';
 
 class RegistrationPage extends StatefulWidget {
   RegistrationPage({Key? key}) : super(key: key);
@@ -12,8 +17,8 @@ class RegistrationPage extends StatefulWidget {
 
 class _RegistrationPageState extends State<RegistrationPage> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController GenController = TextEditingController();
-  TextEditingController ResController = TextEditingController();
+  TextEditingController genController = TextEditingController();
+  TextEditingController resController = TextEditingController();
   TextEditingController conpController = TextEditingController();
   TextEditingController instController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -22,6 +27,45 @@ class _RegistrationPageState extends State<RegistrationPage> {
   TextEditingController lnameController = TextEditingController();
 
   bool isChecked = false;
+
+  String reg = "https://tagyou.siddhidevelopment.com/api/v1/auth/register";
+
+  signup(fname, lname, gender, residence, email, password, igname) async {
+    var headers = {
+      'Accept': 'application/json',
+      'lang': 'en',
+      'apiKey': 'T56c5+xwOzn/BjwN774rJ6ugk8i/N7GYJuL2KpxXhuo=',
+      'appversion': 'v1',
+      'deviceId': '123',
+      'deviceType': '1',
+      'deviceToken': '1234'
+    };
+    var request = http.MultipartRequest('POST',
+        Uri.parse('http://tagyou.siddhidevelopment.com/api/v1/auth/register'));
+    request.fields.addAll({
+      'first_name': '$fname',
+      'last_name': '$lname',
+      'email': '$email@siddhiinfosoft.com',
+      'password': '$password',
+      'is_term_accept': '1',
+      'role': '3',
+      'dob': '22-08-1994',
+      'gender': '$gender',
+      'address': '$residence',
+      'instagram_client_id': '$igname'
+    });
+    // request.files.add(await http.MultipartFile.fromPath(
+    //     'profile_img', '/C:/Users/Harshu Patel/Desktop/background.png'));
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
+    } else {
+      print("----->>>>>>${response.reasonPhrase}");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +140,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     Container(
                       padding: EdgeInsets.all(10),
                       child: TextField(
-                        controller: GenController,
+                        controller: genController,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Gender',
@@ -106,7 +150,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     Container(
                       padding: EdgeInsets.all(10),
                       child: TextField(
-                        controller: ResController,
+                        controller: resController,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Residence',
@@ -190,19 +234,32 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             fontWeight: FontWeight.bold),
                       ),
                     ]),
-                    Container(
-                      height: 70,
-                      width: MediaQuery.of(context).size.width / 1.2,
-                      decoration: BoxDecoration(
-                          color: mainColor,
-                          borderRadius: BorderRadius.all(Radius.circular(15))),
-                      child: const Center(
-                        child: Text(
-                          'SIGN UP',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
+                    InkWell(
+                      onTap: () {
+                        signup(
+                            fnameController.text,
+                            lnameController.text,
+                            genController.text,
+                            resController.text,
+                            emailController.text,
+                            passController.text,
+                            instController.text);
+                      },
+                      child: Container(
+                        height: 70,
+                        width: MediaQuery.of(context).size.width / 1.2,
+                        decoration: BoxDecoration(
+                            color: mainColor,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
+                        child: const Center(
+                          child: Text(
+                            'SIGN UP',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                     ),
